@@ -1,8 +1,6 @@
 import 'package:barbqtonight/core/common_widgets/loading_progress.dart';
 import 'package:barbqtonight/core/common_widgets/snack_bar.dart';
-import 'package:barbqtonight/features/auth/bloc/auth_bloc.dart';
-import 'package:barbqtonight/features/auth/bloc/auth_event.dart';
-import 'package:barbqtonight/features/auth/bloc/auth_state.dart';
+import 'package:barbqtonight/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:barbqtonight/core/common_widgets/country/country_model.dart';
@@ -64,7 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {
-            showSnackBar(context, state.errorMessage);
+            showSnackBar(context, state.message);
           } else if (state is AuthSuccess) {
             Go.namedReplace(context, RouteName.homePage);
           }
@@ -230,11 +228,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                 _passwordController.text ==
                                     _confirmPasswordController.text) {
                               context.read<AuthBloc>().add(
-                                SignUpUserEvent(
+                                AuthSignUp(
                                   firstName: _firstNameController.text,
                                   lastName: _lastNameController.text,
                                   phoneNumber: phoneNumber,
                                   address: _addressController.text,
+                                  profileImage: "",
+                                  status: 0,
                                   email: _emailController.text,
                                   password: _passwordController.text,
                                 ),

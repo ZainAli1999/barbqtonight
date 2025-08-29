@@ -1,6 +1,6 @@
 import 'dart:convert';
-
-import 'package:barbqtonight/features/auth/model/auth_model.dart';
+import 'package:barbqtonight/features/auth/data/models/user_model.dart';
+import 'package:barbqtonight/features/auth/domain/entities/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthLocalRepository {
@@ -16,16 +16,16 @@ class AuthLocalRepository {
     }
   }
 
-  Future<void> saveUser(AuthModel user) async {
+  Future<void> saveUser(UserModel user) async {
     final jsonString = jsonEncode(user.toMap());
     await _sharedPreferences.setString('user', jsonString);
   }
 
-  AuthModel? getUser() {
+  User? getUser() {
     final jsonString = _sharedPreferences.getString('user');
     if (jsonString == null) return null;
     final Map<String, dynamic> map = jsonDecode(jsonString);
-    return AuthModel.fromMap(map);
+    return UserModel.fromMap(map);
   }
 
   String? getToken() {

@@ -1,11 +1,10 @@
-import 'package:barbqtonight/core/current_user_bloc/current_user_bloc.dart';
-import 'package:barbqtonight/core/current_user_bloc/current_user_event.dart';
+import 'package:barbqtonight/core/cubits/app_user_cubit.dart';
 import 'package:barbqtonight/core/route_structure/go_router.dart';
 import 'package:barbqtonight/core/theme/bloc/theme_bloc.dart';
 import 'package:barbqtonight/core/theme/bloc/theme_state.dart';
-import 'package:barbqtonight/features/auth/bloc/auth_bloc.dart';
-import 'package:barbqtonight/features/auth/repository/auth_local_repository.dart';
-import 'package:barbqtonight/features/auth/repository/auth_repository.dart';
+import 'package:barbqtonight/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:barbqtonight/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:barbqtonight/service_locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,26 +13,24 @@ import 'package:responsive_framework/responsive_framework.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  final authLocalRepository = AuthLocalRepository();
-  await authLocalRepository.init();
-  final user = authLocalRepository.getUser();
-  final currentUserBloc = CurrentUserBloc(authLocalRepository);
+  await setupLocator();
+
+  final appUserCubit = serviceLocator<AppUserCubit>();
+  final authLocalDataSource = serviceLocator<AuthLocalDataSource>();
+
+  final user = authLocalDataSource.getCachedUser();
+
   if (user != null) {
-    currentUserBloc.add(AddUserEvent(user));
+    appUserCubit.updateUser(user);
   }
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => ThemeBloc()),
         BlocProvider(
-          create:
-              (_) => AuthBloc(
-                currentUserBloc: currentUserBloc,
-                authRepository: AuthRepository(),
-                authLocalRepository: authLocalRepository,
-              ),
+          create: (_) => serviceLocator<AuthBloc>()..add(FetchAllUsers()),
         ),
-        BlocProvider<CurrentUserBloc>(create: (_) => currentUserBloc),
+        BlocProvider(create: (_) => appUserCubit),
       ],
       child: MyApp(),
     ),

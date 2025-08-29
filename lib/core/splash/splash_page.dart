@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'package:barbqtonight/core/current_user_bloc/current_user_bloc.dart';
-import 'package:barbqtonight/core/current_user_bloc/current_user_state.dart';
+import 'package:barbqtonight/core/cubits/app_user_cubit.dart';
 import 'package:barbqtonight/core/route_structure/go_navigator.dart';
 import 'package:barbqtonight/core/route_structure/go_router.dart';
 import 'package:barbqtonight/core/utils/constants.dart';
@@ -18,15 +17,17 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () {
-      final state = context.read<CurrentUserBloc>().state;
+    Timer(const Duration(seconds: 2), _navigate);
+  }
 
-      if (state is UserInitialState) {
-        Go.namedReplace(context, RouteName.loginPage);
-      } else if (state is UserAddedState) {
-        Go.namedReplace(context, RouteName.homePage);
-      }
-    });
+  void _navigate() {
+    final state = context.read<AppUserCubit>().state;
+
+    if (state is AppUserLoggedIn) {
+      Go.namedReplace(context, RouteName.homePage);
+    } else {
+      Go.namedReplace(context, RouteName.loginPage);
+    }
   }
 
   @override

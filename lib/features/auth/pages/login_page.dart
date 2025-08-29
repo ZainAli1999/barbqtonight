@@ -1,8 +1,6 @@
 import 'package:barbqtonight/core/common_widgets/loading_progress.dart';
 import 'package:barbqtonight/core/common_widgets/snack_bar.dart';
-import 'package:barbqtonight/features/auth/bloc/auth_bloc.dart';
-import 'package:barbqtonight/features/auth/bloc/auth_event.dart';
-import 'package:barbqtonight/features/auth/bloc/auth_state.dart';
+import 'package:barbqtonight/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:barbqtonight/core/extensions/text_style_extension.dart';
@@ -49,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthFailure) {
-          showSnackBar(context, state.errorMessage);
+          showSnackBar(context, state.message);
         } else if (state is AuthSuccess) {
           Go.namedReplace(context, RouteName.homePage);
         }
@@ -114,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
                       context.read<AuthBloc>().add(
-                        SignInUserEvent(
+                        AuthLogin(
                           email: _emailController.text,
                           password: _passwordController.text,
                         ),
